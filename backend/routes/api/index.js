@@ -13,8 +13,15 @@ router.use('/session', sessionRouter);
 
 router.use('/users', usersRouter);
 
+
+
+
+//! Keep this route to test frontend setup in Mod 5
 router.post('/test', (req, res) => {
   res.json({ requestBody: req.body });
 });
+
+
+
 
 module.exports = router;

@@ -1,6 +1,8 @@
 
 
 // backend/config/database.js
+
+require('dotenv').config(); //!------might not need this
 const config = require('./index');
 
 module.exports = {
