@@ -14,6 +14,8 @@ router.use('/session', sessionRouter);
 router.use('/users', usersRouter);
 
 
+router.use('/spots', require('./spots'));
+
 
 
 //! Keep this route to test frontend setup in Mod 5
