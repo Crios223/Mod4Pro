@@ -23,14 +23,18 @@ import { Provider } from "react-redux";
 
 import configureStore from "./store/store.js";
 import { restoreCSRF, csrfFetch } from "./store/csrf.js";
+import * as sessionActions from "./store/session";
 
 const store = configureStore();
 
 if (import.meta.env.MODE !== "production") {
-  restoreCSRF();               // sets XSRF‑TOKEN cookie
-  window.csrfFetch = csrfFetch; // expose for console tests
-  window.store     = store;    // expose Redux store
+  restoreCSRF();
+
+  window.csrfFetch = csrfFetch;
+  window.store = store;
+  window.sessionActions = sessionActions; // <-- ADD THIS LINE
 }
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
