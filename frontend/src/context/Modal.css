@@ -1,0 +1,23 @@
+#modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  #modal-background {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+  }
+  
+  #modal-content {
+    position: relative;
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 0.6rem;
+    max-width: 500px;
+    width: 90%;
+  }
