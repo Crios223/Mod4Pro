@@ -104,6 +104,7 @@ import { Link } from 'react-router-dom';
 import { fetchSpots } from '../../store/spots';
 import './SpotIndex.css';
 
+
 export default function SpotIndex() {
   const dispatch = useDispatch();
   const spots = useSelector(state => Object.values(state.spots.allSpots));
