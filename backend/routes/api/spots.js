@@ -1158,56 +1158,94 @@ async function addExtraSpotInfo(spot) {
 // Routes
 // --------------------
 
-// * 1. GET /api/spots - Get all Spots
-router.get(
-  "/",
-  validateQueryParams,
-  handleValidationErrors,
-  async (req, res) => {
-    try {
-      let { page = 1, size = 20 } = req.query;
+// // * 1. GET /api/spots - Get all Spots
+// router.get(
+//   "/",
+//   validateQueryParams,
+//   handleValidationErrors,
+//   async (req, res) => {
+//     try {
+//       let { page = 1, size = 20 } = req.query;
 
-      if (size && size > 20) {
-        size = 20;
-      }
+//       if (size && size > 20) {
+//         size = 20;
+//       }
 
-      if (page && size) {
-        page = Number(page);
-        size = Number(size);
-        console.log(page, size);
-      }
+//       if (page && size) {
+//         page = Number(page);
+//         size = Number(size);
+//         console.log(page, size);
+//       }
 
-      limit = size;
-      offset = size * (page - 1);
+//       limit = size;
+//       offset = size * (page - 1);
 
-      const allSpots = await Spot.findAll({
-        limit,
-        offset,
-      });
+//       const allSpots = await Spot.findAll({
+//         limit,
+//         offset,
+//       });
 
-      // Add avgRating and previewImage to each spot
-      const spotsWithInfo = await Promise.all(
-        allSpots.map(async (spot) => {
-          return await addExtraSpotInfo(spot);
-        })
-      );
+//       // Add avgRating and previewImage to each spot
+//       const spotsWithInfo = await Promise.all(
+//         allSpots.map(async (spot) => {
+//           return await addExtraSpotInfo(spot);
+//         })
+//       );
 
-      const spots = spotsWithInfo.map(spot => ({
-        ...spot,
-        lat: parseFloat(spot.lat),
-        lng: parseFloat(spot.lng),
-        price: parseFloat(spot.price)
-      }));
+//       const spots = spotsWithInfo.map(spot => ({
+//         ...spot,
+//         lat: parseFloat(spot.lat),
+//         lng: parseFloat(spot.lng),
+//         price: parseFloat(spot.price)
+//       }));
 
 
 
-      return res.status(200).json({ Spots: spots, page, size });
-    } catch (error) {
-      console.error("Error in GET /api/spots:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
+//       return res.status(200).json({ Spots: spots, page, size });
+//     } catch (error) {
+//       console.error("Error in GET /api/spots:", error);
+//       return res.status(500).json({ message: "Internal Server Error" });
+//     }
+//   }
+// );
+
+
+
+// 1. GET /api/spots -- no pagination, return all spots
+router.get("/", validateQueryParams, handleValidationErrors, async (req, res) => {
+  try {
+    // Fetch every spot
+    const allSpots = await Spot.findAll();
+
+    // Attach avgRating + previewImage
+    const spotsWithInfo = await Promise.all(
+      allSpots.map(spot => addExtraSpotInfo(spot))
+    );
+
+    const spots = spotsWithInfo.map(spot => ({
+      ...spot,
+      lat: parseFloat(spot.lat),
+      lng: parseFloat(spot.lng),
+      price: parseFloat(spot.price)
+    }));
+
+    return res.status(200).json({ Spots: spots });
+  } catch (error) {
+    console.error("Error in GET /api/spots:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-);
+});
+
+
+
+
+
+
+
+
+
+
+
 
 // * 2. GET /api/spots/current - Get all Spots owned by Current User
 router.get("/current", requireAuth, async (req, res) => {
@@ -1632,22 +1670,53 @@ router.put(
   }
 );
 
-// * 9. DELETE /api/spots/:spotId - Delete a Spot
+// // * 9. DELETE /api/spots/:spotId - Delete a Spot
+// router.delete("/:spotId", requireAuth, async (req, res) => {
+//   try {
+//     const { spotId } = req.params;
+//     const spot = await Spot.findByPk(spotId);
+
+//     if (!spot) {
+//       return res.status(404).json({ message: "Spot couldn't be found" });
+//     }
+
+//     // Check ownership
+//     if (spot.ownerId !== req.user.id) {
+//       return res.status(403).json({ message: "Forbidden" });
+//     }
+
+//     await spot.destroy();
+//     return res.status(200).json({ message: "Successfully deleted" });
+//   } catch (error) {
+//     console.error("Error in DELETE /api/spots/:spotId:", error);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
+
+
+// * 9. DELETE /api/spots/:spotId - Delete a Spot (with manual cascade)
 router.delete("/:spotId", requireAuth, async (req, res) => {
+  const { spotId } = req.params;
   try {
-    const { spotId } = req.params;
+    // 1) fetch spot & check authorization
     const spot = await Spot.findByPk(spotId);
+    if (!spot) return res.status(404).json({ message: "Spot couldn't be found" });
+    if (spot.ownerId !== req.user.id) return res.status(403).json({ message: "Forbidden" });
 
-    if (!spot) {
-      return res.status(404).json({ message: "Spot couldn't be found" });
+    // 2) delete all SpotImages for this spot
+    await SpotImage.destroy({ where: { spotId: spot.id } });
+
+    // 3) delete all ReviewImages and Reviews for this spot
+    const spotReviews = await Review.findAll({ where: { spotId: spot.id } });
+    for (const review of spotReviews) {
+      await ReviewImage.destroy({ where: { reviewId: review.id } });
     }
+    await Review.destroy({ where: { spotId: spot.id } });
 
-    // Check ownership
-    if (spot.ownerId !== req.user.id) {
-      return res.status(403).json({ message: "Forbidden" });
-    }
-
+    // 4) now it's safe to delete the spot itself
     await spot.destroy();
+
     return res.status(200).json({ message: "Successfully deleted" });
   } catch (error) {
     console.error("Error in DELETE /api/spots/:spotId:", error);

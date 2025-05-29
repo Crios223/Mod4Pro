@@ -42,23 +42,116 @@
 
 // export default Navigation;
 
+// import { NavLink } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import ProfileButton from "./ProfileButton";
+// import "./Navigation.css";
+
+// function Navigation({ isLoaded }) {
+//   const sessionUser = useSelector((s) => s.session.user);
+
+//   return (
+//     <ul className="nav-bar">
+//       <li>
+//         <NavLink to="/">Home</NavLink>
+//       </li>
+
+//       {/* always render ProfileButton; it decides what to show */}
+//       {isLoaded && (
+//         <li>
+//           <ProfileButton user={sessionUser} />
+//         </li>
+//       )}
+//     </ul>
+//   );
+// }
+
+// export default Navigation;
+
+
+
+
+
+
+// import { NavLink } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import ProfileButton from "./ProfileButton";
+// import "./Navigation.css";
+
+// function Navigation({ isLoaded }) {
+//   const sessionUser = useSelector(state => state.session.user);
+
+//   return (
+//     <ul className="nav-bar">
+//       <li>
+//         <NavLink to="/" exact>
+//           <img src="/favicon.ico" alt="Home" className="favicon" />
+//         </NavLink>
+//       </li>
+
+
+//       <li>
+//         <NavLink to="/" exact>
+//           Home
+//         </NavLink>
+//       </li>
+
+
+//       {isLoaded && sessionUser && (
+//         <li>
+//           <NavLink to="/spots/new">
+//             Create a New Spot
+//           </NavLink>
+//         </li>
+//       )}
+
+//       {isLoaded && (
+//         <li className="profile-li">
+//           <ProfileButton user={sessionUser} />
+//         </li>
+//       )}
+//     </ul>
+//   );
+// }
+
+// export default Navigation;
+
+
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ProfileButton from "./ProfileButton";
 import "./Navigation.css";
 
 function Navigation({ isLoaded }) {
-  const sessionUser = useSelector((s) => s.session.user);
+  const sessionUser = useSelector(state => state.session.user);
 
   return (
     <ul className="nav-bar">
+      {/* favicon on the very left */}
       <li>
-        <NavLink to="/">Home</NavLink>
+        <NavLink to="/" end>
+          <img src="/favicon.ico" alt="Home" className="favicon" />
+        </NavLink>
       </li>
 
-      {/* always render ProfileButton; it decides what to show */}
+      {/* your existing links */}
+      <li>
+        <NavLink to="/" end>
+          Home
+        </NavLink>
+      </li>
+
+     + {isLoaded && sessionUser && (
+    <li className="create-li">
+      <NavLink to="/spots/new">
+        Create a New Spot
+      </NavLink>
+    </li>
+  )}
+
+      {/* profile button pushed to the right */}
       {isLoaded && (
-        <li>
+        <li className="profile-li">
           <ProfileButton user={sessionUser} />
         </li>
       )}

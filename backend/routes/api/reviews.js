@@ -36,72 +36,273 @@ const validateReviews = [
 
 const router = express.Router();
 
-// * 1. GET  /api/reviews/current - Get all Reviews of the Current User
-router.get("/current", requireAuth, async (req, res) => {
-  const { id } = req.user;
 
-  const reviews = await Review.findAll({
-    attributes: [
-      "id",
-      "userId",
-      "spotId",
-      "review",
-      "stars",
-      "createdAt",
-      "updatedAt",
-    ],
-    include: [
-      {
-        model: User,
-        as: "User",
-        attributes: [["id", "id"], ["firstName", "firstName"], "lastName"],
-      },
-      {
-        model: Spot,
-        as: "Spot",
-        attributes: {
-          exclude: ["description", "createdAt", "updatedAt"],
+//?---------OG Code \/ ---------
+// // * 1. GET  /api/reviews/current - Get all Reviews of the Current User
+// router.get("/current", requireAuth, async (req, res) => {
+//   const { id } = req.user;
+
+//   const reviews = await Review.findAll({
+//     attributes: [
+//       "id",
+//       "userId",
+//       "spotId",
+//       "review",
+//       "stars",
+//       "createdAt",
+//       "updatedAt",
+//     ],
+//     include: [
+//       {
+//         model: User,
+//         as: "User",
+//         attributes: [["id", "id"], ["firstName", "firstName"], "lastName"],
+//       },
+//       {
+//         model: Spot,
+//         as: "Spot",
+//         attributes: {
+//           exclude: ["description", "createdAt", "updatedAt"],
+//         },
+//         include: [
+//           {
+//             model: SpotImage,
+//             as: "SpotImages",
+//             attributes: [["url", "previewImage"]], // Renaming the field to 'previewImage'
+//           },
+//         ],
+//       },
+//     ],
+//     where: { id },
+//   });
+
+//   let reviewImages = await ReviewImage.findAll({
+//     where: { id },
+//     attributes: ["id", "url"],
+//   });
+
+//   let formattedReviews = reviews.map((review) => {
+//     const reviewObj = review.toJSON(); // Convert to plain object
+
+//     // If there are SpotImages, we want to pull the first one and assign its url as previewImage
+//     if (
+//       reviewObj.Spot &&
+//       reviewObj.Spot.SpotImages &&
+//       reviewObj.Spot.SpotImages.length > 0
+//     ) {
+//       reviewObj.Spot.previewImage = reviewObj.Spot.SpotImages[0].previewImage;
+//       // Remove the SpotImages array after extracting the previewImage
+//       delete reviewObj.Spot.SpotImages;
+
+//       reviewImages = reviewImages[0].dataValues;
+//       console.log("THESE ARE THE IMAGES =>>>!!!!!!!!!!", reviewImages);
+//       reviewObj.ReviewImages = reviewImages;
+//     }
+
+//     return reviewObj;
+//   });
+
+//   res.status(200).json({ Reviews: formattedReviews });
+// });
+
+
+// // * 1. GET  /api/reviews/current - Get all Reviews of the Current User
+// router.get("/current", requireAuth, async (req, res) => {
+//   const { id } = req.user;
+
+//   const reviews = await Review.findAll({
+//     attributes: [
+//       "id",
+//       "userId",
+//       "spotId",
+//       "review",
+//       "stars",
+//       "createdAt",
+//       "updatedAt",
+//     ],
+//     include: [
+//       {
+//         model: User,
+//         as: "User",
+//         attributes: [["id", "id"], ["firstName", "firstName"], "lastName"],
+//       },
+//       {
+//         model: Spot,
+//         as: "Spot",
+//         attributes: {
+//           exclude: ["description", "createdAt", "updatedAt"],
+//         },
+//         include: [
+//           {
+//             model: SpotImage,
+//             as: "SpotImages",
+//             attributes: [["url", "previewImage"]], // Renaming the field to 'previewImage'
+//           },
+//         ],
+//       },
+//     ],
+   
+//    where: { userId: id },    // ← changed here so we filter by the FK
+
+//   });
+
+//   let reviewImages = await ReviewImage.findAll({
+//     where: { id },
+//     attributes: ["id", "url"],
+//   });
+
+//   let formattedReviews = reviews.map((review) => {
+//     const reviewObj = review.toJSON(); // Convert to plain object
+
+//     // If there are SpotImages, we want to pull the first one and assign its url as previewImage
+//     if (
+//       reviewObj.Spot &&
+//       reviewObj.Spot.SpotImages &&
+//       reviewObj.Spot.SpotImages.length > 0
+//     ) {
+//       reviewObj.Spot.previewImage = reviewObj.Spot.SpotImages[0].previewImage;
+//       // Remove the SpotImages array after extracting the previewImage
+//       delete reviewObj.Spot.SpotImages;
+
+//       reviewImages = reviewImages[0].dataValues;
+//       console.log("THESE ARE THE IMAGES =>>>!!!!!!!!!!", reviewImages);
+//       reviewObj.ReviewImages = reviewImages;
+//     }
+
+//     return reviewObj;
+//   });
+
+//   res.status(200).json({ Reviews: formattedReviews });
+// });
+
+
+
+
+
+
+// // * 1. GET  /api/reviews/current - Get all Reviews of the Current User
+// router.get("/current", requireAuth, async (req, res) => {
+//   const userId = req.user.id;
+
+//   const reviews = await Review.findAll({
+//     where: { userId },
+//     attributes: [
+//       "id",
+//       "userId",
+//       "spotId",
+//       "review",
+//       "stars",
+//       "createdAt",
+//       "updatedAt",
+//     ],
+//     include: [
+//       {
+//         model: User,
+//         as: "User",
+//         attributes: ["id", "firstName", "lastName"],
+//       },
+//       {
+//         model: Spot,
+//         as: "Spot",
+//         attributes: {
+//           exclude: ["description", "createdAt", "updatedAt"],
+//         },
+//         include: [
+//           {
+//             model: SpotImage,
+//             as: "SpotImages",
+//             where: { preview: true },
+//             required: false,
+//             attributes: ["url"],
+//           },
+//         ],
+//       },
+//       {
+//         model: ReviewImage,
+//         as: "ReviewImages",
+//         attributes: ["id", "url"],
+//       },
+//     ],
+//   });
+
+//   const formattedReviews = reviews.map((review) => {
+//     const obj = review.toJSON();
+
+//     // extract a single previewImage URL, if present
+//     if (obj.Spot?.SpotImages?.length > 0) {
+//       obj.Spot.previewImage = obj.Spot.SpotImages[0].url;
+//     } else {
+//       obj.Spot.previewImage = null;
+//     }
+//     delete obj.Spot.SpotImages;
+
+//     return obj;
+//   });
+
+//   return res.status(200).json({ Reviews: formattedReviews });
+// });
+
+
+
+router.get("/current", requireAuth, async (req, res, next) => {
+  try {
+    const id = req.user.id;
+
+    // fetch all reviews by this user, including the Spot (with one preview image) and the reviewer
+    const reviews = await Review.findAll({
+      where: { userId: id },
+      attributes: [
+        "id",
+        "userId",
+        "spotId",
+        "review",
+        "stars",
+        "createdAt",
+        "updatedAt",
+      ],
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["id", "firstName", "lastName"],
         },
-        include: [
-          {
-            model: SpotImage,
-            as: "SpotImages",
-            attributes: [["url", "previewImage"]], // Renaming the field to 'previewImage'
+        {
+          model: Spot,
+          as: "Spot",
+          attributes: {
+            exclude: ["description", "createdAt", "updatedAt"],
           },
-        ],
-      },
-    ],
-    where: { id },
-  });
+          include: [
+            {
+              model: SpotImage,
+              as: "SpotImages",
+              where: { preview: true },
+              required: false,
+              attributes: ["url"],
+            },
+          ],
+        },
+      ],
+    });
 
-  let reviewImages = await ReviewImage.findAll({
-    where: { id },
-    attributes: ["id", "url"],
-  });
+    // convert to plain objects and pull out a single previewImage
+    const formattedReviews = reviews.map((review) => {
+      const obj = review.toJSON();
+      obj.Spot.previewImage = obj.Spot.SpotImages?.[0]?.url || null;
+      delete obj.Spot.SpotImages;
+      return obj;
+    });
 
-  let formattedReviews = reviews.map((review) => {
-    const reviewObj = review.toJSON(); // Convert to plain object
-
-    // If there are SpotImages, we want to pull the first one and assign its url as previewImage
-    if (
-      reviewObj.Spot &&
-      reviewObj.Spot.SpotImages &&
-      reviewObj.Spot.SpotImages.length > 0
-    ) {
-      reviewObj.Spot.previewImage = reviewObj.Spot.SpotImages[0].previewImage;
-      // Remove the SpotImages array after extracting the previewImage
-      delete reviewObj.Spot.SpotImages;
-
-      reviewImages = reviewImages[0].dataValues;
-      console.log("THESE ARE THE IMAGES =>>>!!!!!!!!!!", reviewImages);
-      reviewObj.ReviewImages = reviewImages;
-    }
-
-    return reviewObj;
-  });
-
-  res.status(200).json({ Reviews: formattedReviews });
+    return res.status(200).json({ Reviews: formattedReviews });
+  } catch (err) {
+    next(err);
+  }
 });
+
+
+
+
+
 
 // * 2. POST /api/reviews/:reviewId/images - Add an Image to a Review based on the Review's id
 router.post(
@@ -292,3 +493,5 @@ router.delete("/:reviewId", requireAuth, async (req, res) => {
 });
 
 module.exports = router;
+
+
