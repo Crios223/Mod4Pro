@@ -2,10 +2,6 @@
 
 @import 'normalize.css';
 
-
-
-
-
 html, body {
   margin: 0;
 }
@@ -14,9 +10,48 @@ html, body {
   box-sizing: border-box;
 }
 
-
-
 body {
   font-family: 'Proza Libre', sans-serif;
   /* … */
+}
+
+
+.spot-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.spot-image-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.spot-index .spot-image-wrapper {
+  max-width: 250px;
+}
+
+
+.manage-spots .spot-image-wrapper {
+  max-width: 300px;
+}
+
+
+.spot-gallery .gallery-main .spot-image-wrapper {
+  width: 800px;
+  margin-bottom: 1rem;
+}
+
+
+.spot-gallery .gallery-thumbs .spot-image-wrapper {
+  max-width: 200px;
+  margin-right: 0.5rem;
+  display: inline-block;
 }

@@ -1,235 +1,66 @@
-/* simple horizontal bar */
-/* .nav-bar {
-    display: flex;
-    gap: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: #21222c;
-    color: #fff;
-    list-style: none;
-  }
-  
-  .nav-bar a { color: #fff; text-decoration: none; }
-  
-  .profile-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.4rem;
-    cursor: pointer;
-  }
-  
-  /* dropdown //
-  .profile-dropdown {
-    position: absolute;
-    margin-top: 0.5rem;
-    right: 1.5rem;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 0.4rem;
-    list-style: none;
-    padding: 0.5rem 1rem;
-    min-width: 180px;
-    z-index: 1000;
-  }
-  
-  .profile-dropdown.hidden { display: none; }
-  
-  .profile-dropdown li { margin: 0.4rem 0; }
-  .profile-dropdown button {
-    width: 100%;
-    padding: 0.35rem 0;
-    border: none;
-    background: #0062ff;
-    color: #fff;
-    border-radius: 0.3rem;
-    cursor: pointer;
-  } */
-
-
-
-/* .nav-bar {
-  display: flex;
-  gap: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #21222c;
-  color: #fff;
-  list-style: none;
-
-}
-
-.nav-bar a { 
-  color: #fff;
-  text-decoration: none;
-}
-
-.profile-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-/* dropdown 
-
-
-
-.profile-dropdown {
-  position: absolute;
-  margin-top: 0.5rem;
-  right: 1.5rem;
-  background: #21222c;    
-  color: #fff;           
-  border-radius: 0.4rem;
-  list-style: none;
-  padding: 0.5rem 1rem;
-  min-width: 180px;
-  z-index: 1000;
-}
-
-.profile-dropdown.hidden { 
-  display: none;
-}
-
-.profile-dropdown li,
-.profile-dropdown a {
-  margin: 0.4rem 0;
-  color: #fff;           
-  text-decoration: none;
-  display: block;
-}
-
-.profile-dropdown button {
-  width: 100%;
-  padding: 0.35rem 0;
-  border: none;
-  background: #0062ff;
-  color: #fff;
-  border-radius: 0.3rem;
-  cursor: pointer;
-} 
-*/
-/* 
-.nav-bar {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin: 0;            
-  padding: 0.75rem 1.5rem;
-  background: #21222c;
-}
-
-.nav-bar li {
-  list-style: none;
-}
-
-.nav-bar li:not(.profile-li) {
-  margin-right: 1rem;
-}
-
-.favicon {
-  width:  70px;
-  height: 70px;
-  display: block;
-}
-
-.create-li {
-  margin-left: auto;
-  margin-right: 1rem;
-}
-
-.create-li {
-  margin-left: auto;
-  margin-right: 1rem;
-}
-
-.profile-li {
-  margin-left: 0;
-}
-
-.nav-bar a,
-.profile-btn {
-  color: #fff;
-  text-decoration: none;
-}
-
-.profile-btn {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-.profile-dropdown {
-  position: absolute;
-  margin-top: 0.5rem;
-  right: 1.5rem;
-  background: #21222c;
-  color: #fff;
-  border-radius: 0.4rem;
-  list-style: none;
-  padding: 0.5rem 1rem;
-  min-width: 180px;
-  z-index: 1000;
-}
-.profile-dropdown.hidden { display: none; }
-.profile-dropdown li,
-.profile-dropdown a {
-  margin: 0.4rem 0;
-  display: block;
-}
-.profile-dropdown button {
-  width: 100%;
-  padding: 0.35rem 0;
-  border: none;
-  background: #0062ff;
-  color: #fff;
-  border-radius: 0.3rem;
-  cursor: pointer;
-}  */
-
-
-
 .nav-bar {
   display: flex;
   align-items: center;
   width: 100%;
   margin: 0;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;   
   background: #21222c;
 }
 
-/* 2) remove bullets */
+
 .nav-bar li {
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* 3) give spacing between all items except the profile one */
-.nav-bar li:not(.profile-li) {
-  margin-right: 1rem;
-}
 
-/* 4) favicon size */
 .favicon {
-  width:  70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   display: block;
 }
 
-/* 5) push just the profile button to the right */
-.profile-li {
-  margin-left: auto;
-  margin-right: 0;
+
+.site-logo {
+  height: 60px;
+  width: auto;    
+  display: block;
+  margin-left: 0.5rem;
 }
 
-/* 7) link & icon color */
+
+.spacer {
+  flex: 1;
+}
+
+
+.create-li .nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.create-li .nav-link:hover {
+  background: #0062ff;
+  border-color: #0051cc;
+}
+
+
+.profile-li {
+  margin-left: 1rem;
+}
+
+
 .nav-bar a,
 .profile-btn {
   color: #fff;
   text-decoration: none;
 }
 
-/* 8) profile‐icon styling */
+
 .profile-btn {
   background: none;
   border: none;
@@ -237,7 +68,7 @@
   cursor: pointer;
 }
 
-/* 9) dropdown */
+
 .profile-dropdown {
   position: absolute;
   margin-top: 0.5rem;
@@ -250,7 +81,9 @@
   min-width: 180px;
   z-index: 1000;
 }
-.profile-dropdown.hidden { display: none; }
+.profile-dropdown.hidden {
+  display: none;
+}
 .profile-dropdown li,
 .profile-dropdown a {
   margin: 0.4rem 0;

@@ -1,14 +1,12 @@
-// frontend/src/components/SignupFormPage/SignupFormPage.jsx
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import * as sessionActions from "../../store/session";
+import "./SignupForm.css";
 
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import * as sessionActions from '../../store/session';
-import './SignupForm.css';
-
-function SignupFormPage() {
+function SignupFormModal({ onClose }) {
   const dispatch = useDispatch();
   const sessionUser = useSelector((state) => state.session.user);
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -17,38 +15,46 @@ function SignupFormPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  if (sessionUser) return <Navigate to="/" replace={true} />;
+  if (sessionUser) {
+    if (onClose) onClose();
+    window.location.href = "/";
+    return null;
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password === confirmPassword) {
-      setErrors({});
-      return dispatch(
+    if (password !== confirmPassword) {
+      setErrors({
+        confirmPassword:
+          "Confirm Password field must be the same as the Password field",
+      });
+      return;
+    }
+    setErrors({});
+    try {
+      await dispatch(
         sessionActions.signup({
           email,
           username,
           firstName,
           lastName,
-          password
+          password,
         })
-      ).catch(async (res) => {
-        const data = await res.json();
-        if (data?.errors) {
-          setErrors(data.errors);
-        }
-      });
+      );
+      if (onClose) onClose();
+      window.location.href = "/";
+    } catch (res) {
+      const data = await res.json();
+      if (data?.errors) setErrors(data.errors);
     }
-    return setErrors({
-      confirmPassword: "Confirm Password field must be the same as the Password field"
-    });
   };
 
   return (
-    <>
+    <div className="signup-container">
       <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit}>
+      <form className="signup-form" onSubmit={handleSubmit}>
         <label>
-          Email
+          Email:
           <input
             type="text"
             value={email}
@@ -56,9 +62,10 @@ function SignupFormPage() {
             required
           />
         </label>
-        {errors.email && <p>{errors.email}</p>}
+        {errors.email && <p className="error">{errors.email}</p>}
+
         <label>
-          Username
+          Username:
           <input
             type="text"
             value={username}
@@ -66,9 +73,10 @@ function SignupFormPage() {
             required
           />
         </label>
-        {errors.username && <p>{errors.username}</p>}
+        {errors.username && <p className="error">{errors.username}</p>}
+
         <label>
-          First Name
+          First Name:
           <input
             type="text"
             value={firstName}
@@ -76,9 +84,10 @@ function SignupFormPage() {
             required
           />
         </label>
-        {errors.firstName && <p>{errors.firstName}</p>}
+        {errors.firstName && <p className="error">{errors.firstName}</p>}
+
         <label>
-          Last Name
+          Last Name:
           <input
             type="text"
             value={lastName}
@@ -86,9 +95,10 @@ function SignupFormPage() {
             required
           />
         </label>
-        {errors.lastName && <p>{errors.lastName}</p>}
+        {errors.lastName && <p className="error">{errors.lastName}</p>}
+
         <label>
-          Password
+          Password:
           <input
             type="password"
             value={password}
@@ -96,9 +106,10 @@ function SignupFormPage() {
             required
           />
         </label>
-        {errors.password && <p>{errors.password}</p>}
+        {errors.password && <p className="error">{errors.password}</p>}
+
         <label>
-          Confirm Password
+          Confirm Password:
           <input
             type="password"
             value={confirmPassword}
@@ -106,11 +117,14 @@ function SignupFormPage() {
             required
           />
         </label>
-        {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
+        {errors.confirmPassword && (
+          <p className="error">{errors.confirmPassword}</p>
+        )}
+
         <button type="submit">Sign Up</button>
       </form>
-    </>
+    </div>
   );
 }
 
-export default SignupFormPage;
+export default SignupFormModal;

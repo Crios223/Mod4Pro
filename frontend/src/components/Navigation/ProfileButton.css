@@ -1,15 +1,15 @@
 .nav-bar .profile-btn {
-  font-size: 2.5rem;          /* increase size */
-  color: #5588dd;             /* default “blue‐jay” */
+  font-size: 2.5rem;          
+  color: #5588dd;             
   transition: color 0.2s;
 }
 
-/* 2) On hover, switch to aquamarine */
+
 .nav-bar .profile-btn:hover {
   color: aquamarine;
 }
 
-/* 3) And for dropdown buttons, same color scheme */
+
 .profile-dropdown button {
   background-color: #5588dd;
   color: #fff;
