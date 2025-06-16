@@ -1,4 +1,4 @@
-# AirBnB Clone
+# BurrowFinder
 
 ## Database Schema Design
 
