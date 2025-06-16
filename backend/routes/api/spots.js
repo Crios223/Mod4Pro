@@ -1693,7 +1693,7 @@ router.put(
 //   }
 // });
 
-
+//------------------ OG DELETE    -------------------------//
 
 // * 9. DELETE /api/spots/:spotId - Delete a Spot (with manual cascade)
 router.delete("/:spotId", requireAuth, async (req, res) => {
@@ -1707,12 +1707,27 @@ router.delete("/:spotId", requireAuth, async (req, res) => {
     // 2) delete all SpotImages for this spot
     await SpotImage.destroy({ where: { spotId: spot.id } });
 
-    // 3) delete all ReviewImages and Reviews for this spot
-    const spotReviews = await Review.findAll({ where: { spotId: spot.id } });
-    for (const review of spotReviews) {
-      await ReviewImage.destroy({ where: { reviewId: review.id } });
-    }
-    await Review.destroy({ where: { spotId: spot.id } });
+    // // 3) delete all ReviewImages and Reviews for this spot
+    // const spotReviews = await Review.findAll({ where: { spotId: spot.id } });
+    // for (const review of spotReviews) {
+    //   await ReviewImage.destroy({ where: { reviewId: review.id } });
+    // }
+    // await Review.destroy({ where: { spotId: spot.id } });
+
+
+// 3) delete all ReviewImages and Reviews for this spot
+const spotReviews = await Review.findAll({
+  where: { spotId: spot.id },
+  attributes: ["id"]    // ← Add this line to ensure review.id is defined
+});
+
+for (const review of spotReviews) {
+  await ReviewImage.destroy({ where: { reviewId: review.id } });
+}
+
+await Review.destroy({ where: { spotId: spot.id } });
+
+
 
     // 4) now it's safe to delete the spot itself
     await spot.destroy();
@@ -1723,5 +1738,11 @@ router.delete("/:spotId", requireAuth, async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
+
+
+
+
 
 module.exports = router;
