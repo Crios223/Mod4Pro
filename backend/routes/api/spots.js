@@ -1744,28 +1744,6 @@ router.put(
 
 
 
-// // * 9. DELETE /api/spots/:spotId - Delete a Spot
-// router.delete("/:spotId", requireAuth, async (req, res) => {
-//   try {
-//     const { spotId } = req.params;
-//     const spot = await Spot.findByPk(spotId);
-
-//     if (!spot) {
-//       return res.status(404).json({ message: "Spot couldn't be found" });
-//     }
-
-//     // Check ownership
-//     if (spot.ownerId !== req.user.id) {
-//       return res.status(403).json({ message: "Forbidden" });
-//     }
-
-//     await spot.destroy();
-//     return res.status(200).json({ message: "Successfully deleted" });
-//   } catch (error) {
-//     console.error("Error in DELETE /api/spots/:spotId:", error);
-//     return res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
 
 //------------------ OG DELETE    -------------------------//
 
