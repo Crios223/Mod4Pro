@@ -1593,82 +1593,156 @@ router.post(
   }
 );
 
-// * 8.  PUT /api/spots/:spotId - Edit a Spot
+
+
+
+
+// // * 8.  PUT /api/spots/:spotId - Edit a Spot
+// router.put(
+//   "/:spotId",
+//   requireAuth,
+//   validateSpotFields,
+//   handleValidationErrors,
+//   async (req, res) => {
+//     try {
+//       const { spotId } = req.params;
+//       const {
+//         address,
+//         city,
+//         state,
+//         country,
+//         lat,
+//         lng,
+//         name,
+//         description,
+//         price,
+//       } = req.body;
+
+//       const spot = await Spot.findByPk(spotId);
+//       if (!spot) {
+//         return res.status(404).json({ message: "Spot couldn't be found" });
+//       }
+
+//       // Check ownership
+//       if (spot.ownerId !== req.user.id) {
+//         return res.status(403).json({ message: "Forbidden" });
+//       }
+
+//       // Update fields
+//       spot.address = address;
+//       spot.city = city;
+//       spot.state = state;
+//       spot.country = country;
+//       spot.lat = lat;
+//       spot.lng = lng;
+//       spot.name = name;
+//       spot.description = description;
+//       spot.price = price;
+
+//       await spot.save();
+
+//       return res.status(200).json({
+//         id: spot.id,
+//         ownerId: spot.ownerId,
+//         address: spot.address,
+//         city: spot.city,
+//         state: spot.state,
+//         country: spot.country,
+//         lat: Number(spot.lat),
+//         lng: Number(spot.lng),
+//         name: spot.name,
+//         description: spot.description,
+//         price: Number(spot.price),
+//         createdAt: spot.createdAt,
+//         updatedAt: spot.updatedAt,
+//       });
+//     } catch (error) {
+//       console.error("Error in PUT /api/spots/:spotId:", error);
+//       // Handle Sequelize validation errors if any
+//       if (error.name === "SequelizeValidationError") {
+//         const errors = {};
+//         error.errors.forEach((err) => {
+//           errors[err.path] = err.message;
+//         });
+//         return res.status(400).json({
+//           message: "Bad Request",
+//           errors,
+//         });
+//       }
+//       return res.status(500).json({ message: "Internal Server Error" });
+//     }
+//   }
+// );
+
+
+// 8. PUT /api/spots/:spotId — Edit a Spot (replace images)
 router.put(
   "/:spotId",
   requireAuth,
   validateSpotFields,
   handleValidationErrors,
   async (req, res) => {
+    const { spotId } = req.params;
+    const {
+      address,
+      city,
+      state,
+      country,
+      lat,
+      lng,
+      name,
+      description,
+      price,
+      previewImage,      
+      extraImages = [],  
+    } = req.body;
+
     try {
-      const { spotId } = req.params;
-      const {
-        address,
-        city,
-        state,
-        country,
-        lat,
-        lng,
-        name,
-        description,
-        price,
-      } = req.body;
-
+      
       const spot = await Spot.findByPk(spotId);
-      if (!spot) {
-        return res.status(404).json({ message: "Spot couldn't be found" });
-      }
+      if (!spot) return res.status(404).json({ message: "Spot couldn't be found" });
+      if (spot.ownerId !== req.user.id) return res.status(403).json({ message: "Forbidden" });
 
-      // Check ownership
-      if (spot.ownerId !== req.user.id) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
-
-      // Update fields
-      spot.address = address;
-      spot.city = city;
-      spot.state = state;
-      spot.country = country;
-      spot.lat = lat;
-      spot.lng = lng;
-      spot.name = name;
-      spot.description = description;
-      spot.price = price;
-
+      
+      Object.assign(spot, { address, city, state, country, lat, lng, name, description, price });
       await spot.save();
 
-      return res.status(200).json({
-        id: spot.id,
-        ownerId: spot.ownerId,
-        address: spot.address,
-        city: spot.city,
-        state: spot.state,
-        country: spot.country,
-        lat: Number(spot.lat),
-        lng: Number(spot.lng),
-        name: spot.name,
-        description: spot.description,
-        price: Number(spot.price),
-        createdAt: spot.createdAt,
-        updatedAt: spot.updatedAt,
+      
+      await SpotImage.destroy({ where: { spotId: spot.id } });
+
+      
+      const urls = [previewImage, ...extraImages].filter(Boolean);
+      for (let i = 0; i < urls.length; i++) {
+        await SpotImage.create({
+          spotId: spot.id,
+          url: urls[i],
+          preview: i === 0,
+        });
+      }
+
+      
+      const updated = await Spot.findByPk(spot.id, {
+        include: [
+          { model: SpotImage, as: "SpotImages", attributes: ["id","url","preview"] },
+          { model: User, attributes: ["id","firstName","lastName"] },
+        ],
       });
+
+      return res.status(200).json(updated);
     } catch (error) {
       console.error("Error in PUT /api/spots/:spotId:", error);
-      // Handle Sequelize validation errors if any
       if (error.name === "SequelizeValidationError") {
-        const errors = {};
-        error.errors.forEach((err) => {
-          errors[err.path] = err.message;
-        });
-        return res.status(400).json({
-          message: "Bad Request",
-          errors,
-        });
+        const errs = {};
+        error.errors.forEach((e) => (errs[e.path] = e.message));
+        return res.status(400).json({ message: "Bad Request", errors: errs });
       }
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
 );
+
+
+
 
 // // * 9. DELETE /api/spots/:spotId - Delete a Spot
 // router.delete("/:spotId", requireAuth, async (req, res) => {
@@ -1699,37 +1773,22 @@ router.put(
 router.delete("/:spotId", requireAuth, async (req, res) => {
   const { spotId } = req.params;
   try {
-    // 1) fetch spot & check authorization
+    
     const spot = await Spot.findByPk(spotId);
     if (!spot) return res.status(404).json({ message: "Spot couldn't be found" });
     if (spot.ownerId !== req.user.id) return res.status(403).json({ message: "Forbidden" });
 
-    // 2) delete all SpotImages for this spot
+    
     await SpotImage.destroy({ where: { spotId: spot.id } });
 
-    // // 3) delete all ReviewImages and Reviews for this spot
-    // const spotReviews = await Review.findAll({ where: { spotId: spot.id } });
-    // for (const review of spotReviews) {
-    //   await ReviewImage.destroy({ where: { reviewId: review.id } });
-    // }
-    // await Review.destroy({ where: { spotId: spot.id } });
-
-
-// 3) delete all ReviewImages and Reviews for this spot
-const spotReviews = await Review.findAll({
-  where: { spotId: spot.id },
-  attributes: ["id"]    // ← Add this line to ensure review.id is defined
-});
-
-for (const review of spotReviews) {
-  await ReviewImage.destroy({ where: { reviewId: review.id } });
-}
-
-await Review.destroy({ where: { spotId: spot.id } });
-
-
-
-    // 4) now it's safe to delete the spot itself
+    //!double check this
+    const spotReviews = await Review.findAll({ where: { spotId: spot.id } });
+    for (const review of spotReviews) {
+      await ReviewImage.destroy({ where: { reviewId: review.id } });
+    }
+    await Review.destroy({ where: { spotId: spot.id } });
+    //!double check this
+    
     await spot.destroy();
 
     return res.status(200).json({ message: "Successfully deleted" });
@@ -1738,8 +1797,6 @@ await Review.destroy({ where: { spotId: spot.id } });
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-
 
 
 
