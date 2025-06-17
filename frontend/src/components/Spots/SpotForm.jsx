@@ -36,20 +36,59 @@ export default function SpotForm({ mode = 'create' }) {
   const [errors, setErrors] = useState([]);
 
   
-  useEffect(() => {
-    if (isEdit) {
-      dispatch(fetchSpot(spotId)).then(data => {
-        setCountry(data.country);
-        setAddress(data.address);
-        setCity(data.city);
-        setState(data.state);
-        setDescription(data.description);
-        setName(data.name);
-        setPrice(data.price);
-        setPreviewImage(data.previewImage);
-      });
-    }
-  }, [dispatch, isEdit, spotId]);
+  // useEffect(() => {
+  //   if (isEdit) {
+  //     dispatch(fetchSpot(spotId)).then(data => {
+  //       setCountry(data.country);
+  //       setAddress(data.address);
+  //       setCity(data.city);
+  //       setState(data.state);
+  //       setDescription(data.description);
+  //       setName(data.name);
+  //       setPrice(data.price);
+  //       setPreviewImage(data.previewImage);
+  //     });
+  //   }
+  // }, [dispatch, isEdit, spotId]);
+
+
+
+useEffect(() => {
+  if (!isEdit) return;
+
+  dispatch(fetchSpot(spotId)).then(data => {
+    setCountry(data.country);
+    setAddress(data.address);
+    setCity(data.city);
+    setState(data.state);
+    setDescription(data.description);
+    setName(data.name);
+    setPrice(data.price);
+
+    
+    const images = data.SpotImages || [];
+
+    
+    const previewObj = images.find(img => img.preview);
+    setPreviewImage(previewObj ? previewObj.url : "");
+
+    
+    const extras = images
+      .filter(img => !img.preview)
+      .map(img => img.url);
+
+    
+    setUrl2(extras[0] || "");
+    setUrl3(extras[1] || "");
+    setUrl4(extras[2] || "");
+    setUrl5(extras[3] || "");
+  });
+}, [dispatch, isEdit, spotId]);
+
+
+
+
+
 
   const handleSubmit = async e => {
     e.preventDefault();
