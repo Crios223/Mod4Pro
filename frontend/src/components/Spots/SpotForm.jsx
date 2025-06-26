@@ -36,22 +36,6 @@ export default function SpotForm({ mode = 'create' }) {
   const [errors, setErrors] = useState([]);
 
   
-  // useEffect(() => {
-  //   if (isEdit) {
-  //     dispatch(fetchSpot(spotId)).then(data => {
-  //       setCountry(data.country);
-  //       setAddress(data.address);
-  //       setCity(data.city);
-  //       setState(data.state);
-  //       setDescription(data.description);
-  //       setName(data.name);
-  //       setPrice(data.price);
-  //       setPreviewImage(data.previewImage);
-  //     });
-  //   }
-  // }, [dispatch, isEdit, spotId]);
-
-
 
 useEffect(() => {
   if (!isEdit) return;
