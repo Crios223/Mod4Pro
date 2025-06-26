@@ -64,14 +64,6 @@
 }
 
 
-/* button[disabled] {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-  border: 1px solid #aaa;
-  opacity: 0.7;
-} */
-
 button[disabled],
 button[disabled]:hover {
   background-color: #ccc;
@@ -79,5 +71,5 @@ button[disabled]:hover {
   cursor: not-allowed;
   border: 1px solid #aaa;
   opacity: 0.7;
-  pointer-events: none; /* This disables hover/click effects */
+  pointer-events: none; 
 }
